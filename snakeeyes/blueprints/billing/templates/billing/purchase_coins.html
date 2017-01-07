@@ -1,0 +1,20 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/form.html' as f with context %}
+{% import 'billing/macros/billing.html' as billing %}
+
+{% block title %}Purchase coins{% endblock %}
+
+{% block body %}
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4 well">
+      {% call f.form_tag('billing.purchase_coins', fid='payment_form') %}
+        <legend>{{ _('Purchase coins') }}</legend>
+
+        {% call f.form_group(form.coin_bundles, css_class='sm-margin-bottom') %}
+        {% endcall %}
+
+        {{ billing.payment_form(form, 'Process payment', True) }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

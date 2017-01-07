@@ -1,0 +1,54 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/items.html' as items %}
+
+{% block title %}Betting history{% endblock %}
+
+{% block body %}
+  <h2>Betting history</h2>
+  {% if bets.total == 0 %}
+    <p>No bets found.</p>
+  {% else %}
+    <table class="table">
+      <thead>
+      <tr>
+        <th>Date</th>
+        <th>Guess</th>
+        <th>Roll</th>
+        <th>Wagered</th>
+        <th>Payout</th>
+        <th>Net</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for bet in bets.items %}
+        <tr>
+          <td>
+            <time class="from-now"
+                  data-datetime="{{ bet.created_on }}">
+              {{ bet.created_on }}
+            </time>            
+          </td>
+          <td>{{ bet.guess }}</td>
+          <td>
+            {{ bet.roll }}
+            <span class="text-muted">({{ bet.die_1 }} + {{ bet.die_2 }})</span>
+          </td>
+          <td class="text-warning">
+            <i class="fa fa-fw fa-database"></i> {{ bet.wagered }}
+          </td>
+          <td>{{ bet.payout }}x</td>
+          <td class="text-{{ 'success' if bet.net > 0 else 'danger' }}">
+            <i class="fa fa-fw fa-database"></i> {{ bet.net }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+
+    {{ items.paginate(bets) }}
+  {% endif %}
+  <hr/>
+  <a href="{{ url_for('user.settings') }}" class="margin-top btn btn-primary">
+    Go back to your account
+  </a>
+{% endblock %}

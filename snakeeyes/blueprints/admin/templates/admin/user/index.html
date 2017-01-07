@@ -1,0 +1,102 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/items.html' as items %}
+{% import 'macros/form.html' as f with context %}
+{% import 'macros/user.html' as account %}
+
+{% block title %}Admin - Users / List{% endblock %}
+
+{% block body %}
+  {{ f.search('admin.users') }}
+
+  {% if users.total == 0 %}
+    <h3>No results found</h3>
+
+    {% if request.args.get('q') %}
+      <p>Try limiting or removing your search terms.</p>
+    {% else %}
+      <p>There are no users present,
+         you should <a href="{{ url_for('user.signup') }}">sign up</a>.</p>
+    {% endif %}
+  {% else %}
+    {% call f.form_tag('admin.users_bulk_delete') %}
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th>
+              <label for="select_all"></label>
+              <input id="select_all" name="select_all" type="checkbox">
+            </th>
+            <th class="col-header">
+              {{ items.sort('created_on', 'Registered') }}
+            </th>
+            <th class="col-header">
+              {{ items.sort('name') }}
+            </th>
+            <th class="col-header">
+              {{ items.sort('last_bet_on', 'Activity') }}
+            </th>
+            <th class="col-header">
+              {{ items.sort('sign_in_count', 'Sign in count') }}
+            </th>
+            <th id="bulk_actions" colspan="4">
+              <div class="form-inline">
+                {{ f.field(bulk_form.scope, inline=True) }}
+                  <button type="submit"
+                          class="btn btn-danger btn-sm">
+                    Delete items
+                  </button>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for user in users.items %}
+          <tr>
+            <td>
+              <label for="bulk_ids"></label>
+              <input class="checkbox-item" id="bulk_ids" name="bulk_ids"
+                     type="checkbox" value="{{ user.id }}">
+            </td>
+            <td>
+              <time class="from-now"
+                    data-datetime="{{ user.created_on }}">
+                {{ user.created_on }}
+              </time>
+            </td>
+            <td>
+              <a href="{{ url_for('admin.users_edit', id=user.id) }}">
+                <div class="pull-left">
+                  {{ account.role_icon_for(user) }}
+                </div>
+                <h4 class="media-heading">{{ user.username }}</h4>
+
+                <p class="text-muted">{{ user.email }}</p>
+              </a>
+            </td>
+            <td class="small">
+              {% if user.last_sign_in_on %}
+                Last seen: 
+                <time class="from-now"
+                      data-datetime="{{ user.last_sign_in_on }}">
+                  {{ user.last_sign_in_on }}
+                </time>
+              {% endif %}
+              {% if user.last_bet_on %}
+                <br/>
+                Latest bet:
+                <time class="from-now"
+                      data-datetime="{{ user.last_bet_on }}">
+                  {{ user.last_bet_on }}
+                </time>
+              {% endif %}
+            </td>
+            <td>{{ user.sign_in_count }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endcall %}
+
+    {{ items.paginate(users) }}
+  {% endif %}
+{% endblock %}

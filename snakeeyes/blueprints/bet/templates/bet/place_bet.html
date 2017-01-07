@@ -1,0 +1,104 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/form.html' as f with context %}
+
+{% block title %}Place Bet{% endblock %}
+
+{% block body %}
+  <div class="row">
+    <div class="col-md-4">
+      <form id="place_bet" class="sm-margin-top">
+        <legend class="text-warning">
+          <strong id="user_coins">{{ current_user.coins }}</strong> coins left
+        </legend>
+        <div class="form-group">
+          <label for="guess"><strong>Guess</strong></label>
+            <select class="form-control" id="guess" name="guess"
+                    title="What number will be rolled?">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+              <option value="11">11</option>
+              <option value="12">12</option>
+            </select>
+        </div>
+        <div class="form-group">
+          <label for="wager"><strong>Wager</strong></label>
+            <div class="input-group">
+              <div class="input-group-addon">
+                <i class="fa fa-fw fa-database"></i>
+              </div>
+              <input type="number" min="1" class="form-control"
+                     id="wagered" name="wagered"
+                     placeholder="100" title="How many coins do you want to wager?">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block sm-margin-top">
+          <img src="{{ url_for('static', filename='images/spinner.gif') }}"
+               class="spinner"
+               width="16" height="11" alt="Spinner"/>
+          Place Bet
+        </button>
+
+        <noscript>
+          <p class="alert alert-sm alert-warning text-center sm-margin-top">
+            You need to enable JavaScript to place bets.
+          </p>
+        </noscript>
+
+        <div id="dice" class="text-center"></div>
+        <div id="outcome" class="alert alert-sm text-center sm-margin-top"></div>
+
+        <hr/>
+
+        <div class="text-center">
+          <a href="{{ url_for('billing.purchase_coins') }}"
+             class="btn btn-default">Buy more coins</a>
+        </div>
+      </form>
+    </div>
+    <div class="col-md-7 col-md-offset-1">
+      <div id="recent_bets">
+        <h2>Recent bets</h2>
+        {% if recent_bets.count() == 0 %}
+          <p>No bets found.</p>
+        {% else %}
+          <table class="table">
+            <thead>
+            <tr>
+              <th>Guess</th>
+              <th>Roll</th>
+              <th>Wagered</th>
+              <th>Payout</th>
+              <th>Net</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for bet in recent_bets %}
+              <tr>
+                <td>{{ bet.guess }}</td>
+                <td>{{ bet.roll }}</td>
+                <td class="text-warning">
+                  <i class="fa fa-fw fa-database"></i> {{ bet.wagered }}
+                </td>
+                <td>{{ bet.payout }}x</td>
+                <td class="text-{{ 'success' if bet.net > 0 else 'danger' }}">
+                  <i class="fa fa-fw fa-database"></i> {{ bet.net }}
+                </td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+        <a href="{{ url_for('bet.history') }}">
+          <span class="btn btn-sm btn-default">View full betting history</span>
+        </a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

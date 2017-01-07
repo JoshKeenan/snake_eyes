@@ -1,0 +1,88 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/items.html' as items %}
+{% import 'macros/form.html' as f with context %}
+{% import 'macros/user.html' as account %}
+
+{% block title %}Admin - Invoices / List{% endblock %}
+
+{% block body %}
+  {{ f.search('admin.invoices') }}
+
+  {% if invoices.total == 0 %}
+    <h3>No results found</h3>
+
+    {% if request.args.get('q') %}
+      <p>Try limiting or removing your search terms.</p>
+    {% else %}
+      <p>There are no invoices present, you should market your service.</p>
+    {% endif %}
+  {% else %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th class="col-header">
+            {{ items.sort('created_on', 'Date') }}
+          </th>
+          <th class="col-header">
+            {{ items.sort('user_id', 'User') }}
+          </th>
+          <th class="col-header">
+            {{ items.sort('description', 'Description') }}
+          </th>
+          <th class="col-header">
+            {{ items.sort('period_start_on', 'Service period') }}
+          </th>
+          <th class="col-header">
+            {{ items.sort('tax', 'Tax') }}
+          </th>
+          <th class="col-header">
+            {{ items.sort('total', 'Total') }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for invoice in invoices.items %}
+        <tr>
+          <td>
+            <time class="from-now"
+                  data-datetime="{{ invoice.created_on }}">
+              {{ invoice.created_on }}
+            </time>
+          </td>
+          <td>
+            <a href="{{ url_for('admin.users_edit', id=invoice.users.id) }}">
+              <div class="pull-left">
+                {{ account.role_icon_for(invoice.users) }}
+              </div>
+              <h4 class="media-heading">{{ invoice.users.username }}</h4>
+
+              <p class="text-muted">{{ invoice.users.email }}</p>
+            </a>
+          </td>
+          <td class="small">
+            {{ invoice.brand }} ****{{ invoice.last4 }}
+            <br/>
+            {{ invoice.description }}
+          </td>
+          <td>
+            <time class="short-date" data-datetime="{{ invoice.period_start_on }}">
+              {{ invoice.period_start_on }}
+            </time>
+            <span class="text-info">&mdash;</span>
+            <time class="short-date" data-datetime="{{ invoice.period_end_on }}">
+              {{ invoice.period_end_on }}
+            </time>
+          </td>
+          <td title="{{ (invoice.tax_percent | round(2)) | string + '%' if invoice.tax_percent }}">
+            {{ '$' + invoice.tax | format_currency if invoice.tax }}
+          </td>
+          <td title="{{ invoice.currency }}">
+            ${{ invoice.total | format_currency }}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {{ items.paginate(invoices) }}
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,80 @@
+{% import 'macros/flash.html' as flash with context %}
+{% import 'billing/macros/billing.html' as billing with context %}
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="{% block meta_description %}{% endblock %}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <title>{% block title %}{% endblock %}</title>
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/vendor/bootstrap.min.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/main.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/vendor/font-awesome.min.css') }}">
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='styles/vendor/eonasdan-bootstrap-datetimepicker.4.13.30.min.css') }}">
+    <script
+      src="https://code.jquery.com/jquery-1.12.2.min.js"
+      integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk="
+      crossorigin="anonymous"></script>
+    <script src="https://js.stripe.com/v2/"></script>
+
+    {% if config['ANALYTICS_GOOGLE_UA'] %}
+      <script>
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+        ga('create', "{{ config['ANALYTICS_GOOGLE_UA'] }}", 'auto');
+        ga('send', 'pageview');
+      </script>
+    {% endif %}
+  </head>
+  <body>
+    {% block header %}{% endblock %}
+
+    {{ billing.card_expiring_warning() }}
+    
+    <main class="container">
+      {{ flash.render() }}
+
+      <div class="md-margin-top">{% block heading %}{% endblock %}</div>
+      {% block body %}{% endblock %}
+    </main>
+
+    <footer class="footer text-center">
+      <div class="container">
+        <ul class="list-inline">
+          <li class="text-muted">Snake Eyes &copy; {{ current_year() }}</li>
+          {% block footer %}{% endblock %}
+        </ul>
+      </div>
+    </footer>
+
+    <script
+      src="{{ url_for('static', filename='scripts/vendor/bootstrap.min.js') }}">
+    </script>
+    <script
+      src="{{ url_for('static', filename='scripts/vendor/moment.min.js') }}">
+    </script>
+    <script
+      src="{{ url_for('static', filename='scripts/vendor/eonasdan-bootstrap-datetimepicker.4.14.30.min.js') }}">
+    </script>
+    <script
+      src="{{ url_for('static', filename='scripts/main.js') }}">
+    </script>
+  </body>
+</html>

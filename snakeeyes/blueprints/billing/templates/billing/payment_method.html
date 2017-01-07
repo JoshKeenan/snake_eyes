@@ -1,0 +1,39 @@
+{% extends 'layouts/app.html' %}
+{% import 'macros/form.html' as f with context %}
+{% import 'billing/macros/billing.html' as billing %}
+
+{% set plan_name = request.args.get('plan', '') %}
+{% set is_create = request.endpoint.endswith('create') %}
+{% if is_create %}
+  {% set title = _('Enter payment information') %}
+  {% set endpoint = 'billing.create' %}
+  {% set button = _('Process payment') %}
+{% else %}
+  {% set title = _('Update payment information') %}
+  {% set endpoint = 'billing.update_payment_method' %}
+  {% set button = _('Update payment method') %}
+{% endif %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block body %}
+  <div class="row">
+    <div class="col-md-4 col-md-offset-4 well">
+      {% call f.form_tag(endpoint, fid='subscription_form') %}
+        <legend>
+          {% if is_create %}
+            {{ plan_name | title }} {{ _('subscription') }}<br/>
+              <span class="small text-muted">
+                {{ _('This plan costs') }}
+                ${{ plan.amount | format_currency }} / {{ plan.interval }}
+              </span>
+          {% else %}
+            {{ title }}
+          {% endif %}
+        </legend>
+
+        {{ billing.payment_form(form, button, is_create) }}
+      {% endcall %}
+    </div>
+  </div>
+{% endblock %}

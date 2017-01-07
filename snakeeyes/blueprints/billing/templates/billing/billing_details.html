@@ -1,0 +1,15 @@
+{% extends 'layouts/app.html' %}
+{% import 'billing/macros/billing.html' as billing %}
+
+{% block title %}Billing details and history{% endblock %}
+
+{% block body %}
+  {{ billing.subscription_details(coupon) }}
+  {{ billing.upcoming_invoice(upcoming) }}
+  {{ billing.invoices(paginated_invoices) }}
+
+  <hr/>
+  <a href="{{ url_for('user.settings') }}" class="btn btn-primary">
+    Go back to your account
+  </a>
+{% endblock %}
